@@ -1,102 +1,60 @@
-import { lazy, Suspense, useCallback, useState } from "react";
-import { Toaster } from "react-hot-toast";
-import Header from "./components/Header.jsx";
-import Sidebar from "./components/Sidebar.jsx";
-import Home from "./pages/Home.jsx";
-import useLocalStorage from "./hooks/useLocalStorage.js";
-import {
-  addHistoryEntry,
-  clearHistory,
-  loadHistory,
-} from "./services/historyService.js";
+// src/App.jsx
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import BottomNav from './components/BottomNav';
 
-const History = lazy(() => import("./pages/History.jsx"));
+const Home = lazy(() => import('./pages/Home'));
+const History = lazy(() => import('./pages/History'));
+const Settings = lazy(() => import('./pages/Settings'));
 
-const defaultSettings = {
-  domain: "",
-  shopName: "",
-  phone: "",
-};
+function App() {
+  const [dark, setDark] = useState(() => {
+    return localStorage.getItem('ananya-theme') === 'dark';
+  });
 
-const views = {
-  home: "home",
-  history: "history",
-};
-
-const App = () => {
-  const [activeView, setActiveView] = useState(views.home);
-  const [settings, setSettings] = useLocalStorage(
-    "csc-smart-share-settings",
-    defaultSettings,
-  );
-  const [history, setHistory] = useState(() => loadHistory());
-
-  const handleSaveSettings = useCallback(
-    (nextSettings) => setSettings(nextSettings),
-    [setSettings],
-  );
-
-  const handleConverted = useCallback((entry) => {
-    setHistory((currentHistory) => addHistoryEntry(currentHistory, entry));
-  }, []);
-
-  const handleClearHistory = useCallback(() => {
-    clearHistory();
-    setHistory([]);
-  }, []);
-
-  const renderActivePage = () => {
-    if (activeView === views.history) {
-      return (
-        <Suspense
-          fallback={
-            <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/10 backdrop-blur-xl sm:p-8">
-              <div className="animate-pulse space-y-4">
-                <div className="h-6 w-32 rounded-full bg-white/10" />
-                <div className="h-8 w-64 rounded-full bg-white/10" />
-                <div className="h-32 rounded-3xl bg-white/10" />
-                <div className="h-32 rounded-3xl bg-white/10" />
-              </div>
-            </section>
-          }
-        >
-          <History history={history} onClearHistory={handleClearHistory} />
-        </Suspense>
-      );
+  useEffect(() => {
+    if (dark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
-
-    return <Home settings={settings} onConverted={handleConverted} />;
-  };
+    localStorage.setItem('ananya-theme', dark ? 'dark' : 'light');
+  }, [dark]);
 
   return (
-    <div className="min-h-screen text-slate-100">
-      <Header activeView={activeView} onNavigate={setActiveView} />
-
-      <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:px-8 xl:grid-cols-[minmax(0,1.2fr)_380px] 2xl:grid-cols-[minmax(0,1.25fr)_420px]">
-        <main className="min-w-0">{renderActivePage()}</main>
-
-        <aside className="space-y-4 xl:sticky xl:top-28 xl:self-start">
-          <Sidebar
-            activeView={activeView}
-            onNavigate={setActiveView}
-            settings={settings}
-            onSaveSettings={handleSaveSettings}
-          />
-        </aside>
-      </div>
-
+    <div className="min-h-screen">
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-[80vh]">
+          <div className="spinner" />
+        </div>
+      }>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/settings" element={<Settings toggleTheme={() => setDark(!dark)} dark={dark} />} />
+        </Routes>
+      </Suspense>
+      <BottomNav />
       <Toaster
-        position="top-right"
+        position="bottom-center"
         toastOptions={{
+          duration: 3000,
           style: {
-            background: "#0f172a",
-            color: "#e2e8f0",
-            border: "1px solid rgba(148, 163, 184, 0.2)",
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(16px)',
+            borderRadius: '1rem',
+            padding: '12px 20px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+            border: '1px solid rgba(255,255,255,0.3)',
+          },
+          success: {
+            iconTheme: { primary: '#7c3aed', secondary: 'white' },
           },
         }}
       />
     </div>
   );
-};
+}
 
 export default App;

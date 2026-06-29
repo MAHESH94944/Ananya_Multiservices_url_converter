@@ -1,25 +1,18 @@
-import { memo } from "react";
+// src/components/Header.jsx
+import { FiLink } from 'react-icons/fi';
+
 const Header = () => {
   return (
-    <header className="sticky top-0 z-20 border-b border-white/10 bg-slate-950/85 backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="space-y-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.38em] text-orange-300/80">
-              CSC Smart Share
-            </p>
-            <h1 className="serif-heading text-xl font-bold text-white sm:text-2xl">
-              Turn government scheme links into your own portal link
-            </h1>
-            <p className="max-w-2xl text-sm text-slate-300">
-              Paste a message, tap convert, and get your own portal link
-              instantly.
-            </p>
-          </div>
-        </div>
+    <div className="flex items-center gap-3 py-2">
+      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center">
+        <FiLink className="text-white text-xl" />
       </div>
-    </header>
+      <div>
+        <h1 className="text-base font-bold text-slate-800 dark:text-white">Ananya Multiservices</h1>
+        <span className="text-xs font-medium text-purple-600 dark:text-purple-400">URL Converter</span>
+      </div>
+    </div>
   );
 };
 
-export default memo(Header);
+export default Header;

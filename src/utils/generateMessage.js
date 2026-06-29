@@ -1,12 +1,4 @@
-const generateMessage = (convertedUrl, shopName, phoneNumber) => {
-  return `📢 New Government Scheme Update
-
-🔗 ${convertedUrl}
-
-Visit:
-${shopName || "Your CSC Portal"}
-
-📞 ${phoneNumber || "N/A"}`;
+// src/utils/generateMessage.js
+export const generateMessage = (url, shop, phone) => {
+  return `📢 New Government Scheme Update\n\n🔗 ${url}\n\nVisit:\n${shop}\n\n📞 ${phone}`;
 };
-
-export { generateMessage };

@@ -1,122 +1,124 @@
-import { memo, useState } from "react";
-import toast from "react-hot-toast";
-import { normalizeDomainInput } from "../utils/convertUrl.js";
+// src/pages/Settings.jsx
+import { useState, useEffect } from 'react';
+import { FiMoon, FiSun, FiSave, FiUser, FiGlobe, FiSmartphone } from 'react-icons/fi';
+import toast from 'react-hot-toast';
 
-const Settings = ({ settings, onSave, compact = false }) => {
-  const [formData, setFormData] = useState(settings);
+const Settings = ({ toggleTheme, dark }) => {
+  const [domain, setDomain] = useState('');
+  const [shop, setShop] = useState('');
+  const [phone, setPhone] = useState('');
+  const [saved, setSaved] = useState(false);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  useEffect(() => {
+    setDomain(localStorage.getItem('ananya-domain') || 'sakhalibkgs.cscjob.com');
+    setShop(localStorage.getItem('ananya-shop') || 'Ananya Multiservices');
+    setPhone(localStorage.getItem('ananya-phone') || '9876543210');
+  }, []);
 
-    const nextSettings = {
-      domain: normalizeDomainInput(formData.domain),
-      shopName: formData.shopName.trim(),
-      phone: formData.phone.trim(),
-    };
-
-    onSave(nextSettings);
-    setFormData(nextSettings);
-    toast.success("Settings saved in your browser");
+  const handleSave = () => {
+    if (!domain.trim()) {
+      toast.error('Domain is required');
+      return;
+    }
+    localStorage.setItem('ananya-domain', domain.trim());
+    localStorage.setItem('ananya-shop', shop.trim() || 'Ananya Multiservices');
+    localStorage.setItem('ananya-phone', phone.trim() || '');
+    setSaved(true);
+    toast.success('Settings saved successfully!');
+    setTimeout(() => setSaved(false), 3000);
   };
 
   return (
-    <section className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-4 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-5">
-      <div className="flex items-start justify-between gap-4">
+    <div className="container-responsive">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6 animate-fade-in-up">
         <div>
-          <h2 className="serif-heading mt-2 text-2xl font-bold text-white">
-            {compact
-              ? "Your shop details"
-              : "Save your personal CSC portal details"}
-          </h2>
-          {!compact ? (
-            <p className="mt-3 text-sm leading-6 text-slate-300">
-              Add these details once.
-            </p>
-          ) : (
-            <p className="mt-3 text-sm leading-6 text-slate-300">
-              Keep this updated so your links use the right domain.
-            </p>
-          )}
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">Settings</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Customize your converter</p>
         </div>
+        <button
+          onClick={toggleTheme}
+          className="p-3 rounded-2xl glass-card hover:bg-purple-100/50 dark:hover:bg-purple-900/30 transition"
+        >
+          {dark ? <FiSun className="text-yellow-400 text-xl" /> : <FiMoon className="text-slate-600 text-xl" />}
+        </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-slate-300">
-            Personal domain
-          </span>
+      {/* Settings Form */}
+      <div className="glass-card p-6 md:p-8 space-y-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+        {/* Domain */}
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <FiGlobe className="text-purple-500" />
+            My Domain
+          </label>
           <input
             type="text"
-            value={formData.domain}
-            onChange={(event) =>
-              setFormData((current) => ({
-                ...current,
-                domain: event.target.value,
-              }))
-            }
+            className="setting-input"
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
             placeholder="sakhalibkgs.cscjob.com"
-            className="w-full rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-orange-300/40 focus:bg-white/8 focus:ring-4 focus:ring-orange-400/10"
           />
-        </label>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-1.5">
+            Replaces <span className="font-mono text-purple-500">news.cscjob.com</span> in URLs
+          </p>
+        </div>
 
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-slate-300">
-            Shop name
-          </span>
+        {/* Shop Name */}
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <FiUser className="text-purple-500" />
+            Shop Name
+          </label>
           <input
             type="text"
-            value={formData.shopName}
-            onChange={(event) =>
-              setFormData((current) => ({
-                ...current,
-                shopName: event.target.value,
-              }))
-            }
+            className="setting-input"
+            value={shop}
+            onChange={(e) => setShop(e.target.value)}
             placeholder="Ananya Multiservices"
-            className="w-full rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-orange-300/40 focus:bg-white/8 focus:ring-4 focus:ring-orange-400/10"
           />
-        </label>
+        </div>
 
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-slate-300">
-            Phone number
-          </span>
+        {/* Phone */}
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <FiSmartphone className="text-purple-500" />
+            Phone Number
+          </label>
           <input
             type="tel"
-            value={formData.phone}
-            onChange={(event) =>
-              setFormData((current) => ({
-                ...current,
-                phone: event.target.value,
-              }))
-            }
-            placeholder="9552319904"
-            className="w-full rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-orange-300/40 focus:bg-white/8 focus:ring-4 focus:ring-orange-400/10"
+            className="setting-input"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="9876543210"
           />
-        </label>
+        </div>
 
-        <button
-          type="submit"
-          className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-orange-400 to-amber-300 px-5 py-3 text-sm font-bold text-slate-950 shadow-lg shadow-orange-900/30 transition hover:scale-[1.01]"
+        {/* Save Button */}
+        <button 
+          onClick={handleSave} 
+          className="btn-primary flex items-center justify-center gap-2"
         >
-          Save settings
+          {saved ? (
+            <>
+              <FiSave className="text-green-300" />
+              Saved!
+            </>
+          ) : (
+            <>
+              <FiSave />
+              Save Settings
+            </>
+          )}
         </button>
-      </form>
-
-      <div className="mt-4 rounded-3xl border border-emerald-300/15 bg-emerald-400/10 p-4 text-sm text-emerald-50">
-        <p className="font-semibold">Saved values</p>
-        <p className="mt-2 break-all">
-          Domain: {settings.domain || "Not saved yet"}
-        </p>
-        <p className="mt-1 break-all">
-          Shop: {settings.shopName || "Not saved yet"}
-        </p>
-        <p className="mt-1 break-all">
-          Phone: {settings.phone || "Not saved yet"}
-        </p>
       </div>
-    </section>
+
+      {/* Info */}
+      <div className="mt-4 text-center text-xs text-slate-400 dark:text-slate-500 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+        <p>All settings are saved locally in your browser</p>
+      </div>
+    </div>
   );
 };
 
-export default memo(Settings);
+export default Settings;

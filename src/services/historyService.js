@@ -1,52 +1,31 @@
-const HISTORY_STORAGE_KEY = "csc-smart-share-history";
-const HISTORY_LIMIT = 20;
+// src/services/historyService.js
+const STORAGE_KEY = "ananya-history";
 
-const readHistory = () => {
-  if (typeof window === "undefined") {
-    return [];
-  }
-
+export const getHistory = () => {
   try {
-    const storedHistory = window.localStorage.getItem(HISTORY_STORAGE_KEY);
-
-    if (!storedHistory) {
-      return [];
-    }
-
-    const parsedHistory = JSON.parse(storedHistory);
-
-    return Array.isArray(parsedHistory) ? parsedHistory : [];
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
   }
 };
 
-const saveHistory = (history) => {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+export const addHistoryItem = (item) => {
+  const history = getHistory();
+  const updated = [
+    item,
+    ...history.filter((h) => h.timestamp !== item.timestamp),
+  ];
+  if (updated.length > 20) updated.pop();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 };
 
-const loadHistory = () => readHistory();
-
-const addHistoryEntry = (currentHistory, entry) => {
-  const nextEntry = {
-    id: `${entry.timestamp}-${Math.random().toString(36).slice(2, 8)}`,
-    timestamp: entry.timestamp ?? Date.now(),
-    originalUrl: entry.originalUrl,
-    convertedUrl: entry.convertedUrl,
-  };
-
-  const nextHistory = [nextEntry, ...currentHistory].slice(0, HISTORY_LIMIT);
-  saveHistory(nextHistory);
-
-  return nextHistory;
+export const clearHistory = () => {
+  localStorage.removeItem(STORAGE_KEY);
 };
 
-const clearHistory = () => {
-  saveHistory([]);
+export const deleteHistoryItem = (timestamp) => {
+  const history = getHistory();
+  const filtered = history.filter((h) => h.timestamp !== timestamp);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
 };
-
-export { HISTORY_STORAGE_KEY, addHistoryEntry, clearHistory, loadHistory };

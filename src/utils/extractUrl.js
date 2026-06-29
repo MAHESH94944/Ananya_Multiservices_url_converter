@@ -1,19 +1,7 @@
-const URL_REGEX = /(https?:\/\/[^\s]+)/g;
-
-const trimUrl = (value) => value.replace(/[),.\]]+$/g, "");
-
-const extractFirstUrl = (text) => {
-  if (!text) {
-    return "";
-  }
-
-  const matches = text.match(URL_REGEX);
-
-  if (!matches || matches.length === 0) {
-    return "";
-  }
-
-  return trimUrl(matches[0]);
+// src/utils/extractUrl.js
+export const extractUrl = (text) => {
+  if (!text) return null;
+  const regex = /(https?:\/\/[^\s]+)/g;
+  const match = text.match(regex);
+  return match ? match[0] : null;
 };
-
-export { URL_REGEX, extractFirstUrl };
