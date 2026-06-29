@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Ananya Multiservices URL Converter</string>
+    <string name="title_activity_main">Ananya Multiservices URL Converter</string>
+    <string name="package_name">com.ananya.urlconverter</string>
+    <string name="custom_url_scheme">com.ananya.urlconverter</string>
+</resources>

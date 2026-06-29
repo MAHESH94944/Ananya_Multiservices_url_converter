@@ -1,6 +1,5 @@
 import { lazy, memo, Suspense, useCallback, useState } from "react";
 import toast from "react-hot-toast";
-import Settings from "./Settings.jsx";
 import UrlInput from "../components/UrlInput.jsx";
 import { convertUrl } from "../utils/convertUrl.js";
 import { extractFirstUrl } from "../utils/extractUrl.js";
@@ -13,7 +12,7 @@ const sampleMessage = `PM Kisan Registration Started
 
 https://news.cscjob.com/view-job?cat_id=1&id=1080&title=dcc`;
 
-const Home = ({ settings, onSaveSettings, onConverted }) => {
+const Home = ({ settings, onConverted }) => {
   const [inputValue, setInputValue] = useState(sampleMessage);
   const [result, setResult] = useState(null);
   const [autoCopiedMessage, setAutoCopiedMessage] = useState("");
@@ -120,60 +119,54 @@ const Home = ({ settings, onSaveSettings, onConverted }) => {
   const handleUseSample = useCallback(() => setInputValue(sampleMessage), []);
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_380px] 2xl:grid-cols-[minmax(0,1.25fr)_420px]">
-      <div className="space-y-6">
-        <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl shadow-black/10 backdrop-blur-xl">
-          <div className="p-4 sm:p-5">
-            <UrlInput
-              value={inputValue}
-              onChange={setInputValue}
-              onConvert={handleConvert}
-              onClear={handleClear}
-              onUseSample={handleUseSample}
-            />
-          </div>
+    <div className="space-y-6">
+      <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl shadow-black/10 backdrop-blur-xl">
+        <div className="p-4 sm:p-5">
+          <UrlInput
+            value={inputValue}
+            onChange={setInputValue}
+            onConvert={handleConvert}
+            onClear={handleClear}
+            onUseSample={handleUseSample}
+          />
+        </div>
+      </section>
+
+      {result ? (
+        <Suspense
+          fallback={
+            <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/10 backdrop-blur-xl sm:p-8">
+              <div className="animate-pulse space-y-4">
+                <div className="h-6 w-40 rounded-full bg-white/10" />
+                <div className="h-4 w-56 rounded-full bg-white/10" />
+                <div className="h-28 rounded-3xl bg-white/10" />
+              </div>
+            </section>
+          }
+        >
+          <ResultCard
+            convertedUrl={result.convertedUrl}
+            originalUrl={result.originalUrl}
+            onCopy={copyText}
+            onShare={shareText}
+            autoCopied={autoCopiedMessage === result.message}
+          />
+          <MessageCard
+            message={result.message}
+            onCopy={copyText}
+            onShare={shareText}
+          />
+        </Suspense>
+      ) : (
+        <section className="rounded-[2rem] border border-dashed border-white/15 bg-white/5 p-6 text-center shadow-2xl shadow-black/10 backdrop-blur-xl sm:p-8">
+          <h2 className="serif-heading text-2xl font-bold text-white sm:text-3xl">
+            Your converted link will appear here
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Paste a message and tap convert.
+          </p>
         </section>
-
-        {result ? (
-          <Suspense
-            fallback={
-              <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/10 backdrop-blur-xl sm:p-8">
-                <div className="animate-pulse space-y-4">
-                  <div className="h-6 w-40 rounded-full bg-white/10" />
-                  <div className="h-4 w-56 rounded-full bg-white/10" />
-                  <div className="h-28 rounded-3xl bg-white/10" />
-                </div>
-              </section>
-            }
-          >
-            <ResultCard
-              convertedUrl={result.convertedUrl}
-              originalUrl={result.originalUrl}
-              onCopy={copyText}
-              onShare={shareText}
-              autoCopied={autoCopiedMessage === result.message}
-            />
-            <MessageCard
-              message={result.message}
-              onCopy={copyText}
-              onShare={shareText}
-            />
-          </Suspense>
-        ) : (
-          <section className="rounded-[2rem] border border-dashed border-white/15 bg-white/5 p-6 text-center shadow-2xl shadow-black/10 backdrop-blur-xl sm:p-8">
-            <h2 className="serif-heading text-2xl font-bold text-white sm:text-3xl">
-              Your converted link will appear here
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-slate-300">
-              Add your details in the sidebar, paste a message, and tap convert.
-            </p>
-          </section>
-        )}
-      </div>
-
-      <aside className="space-y-4 xl:sticky xl:top-28 xl:self-start">
-        <Settings settings={settings} onSave={onSaveSettings} compact />
-      </aside>
+      )}
     </div>
   );
 };

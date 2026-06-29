@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import Header from "./components/Header.jsx";
+import Sidebar from "./components/Sidebar.jsx";
 import Home from "./pages/Home.jsx";
 import useLocalStorage from "./hooks/useLocalStorage.js";
 import {
@@ -64,22 +65,25 @@ const App = () => {
       );
     }
 
-    return (
-      <Home
-        settings={settings}
-        onSaveSettings={handleSaveSettings}
-        onConverted={handleConverted}
-      />
-    );
+    return <Home settings={settings} onConverted={handleConverted} />;
   };
 
   return (
     <div className="min-h-screen text-slate-100">
       <Header activeView={activeView} onNavigate={setActiveView} />
 
-      <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-        {renderActivePage()}
-      </main>
+      <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:px-8 xl:grid-cols-[minmax(0,1.2fr)_380px] 2xl:grid-cols-[minmax(0,1.25fr)_420px]">
+        <main className="min-w-0">{renderActivePage()}</main>
+
+        <aside className="space-y-4 xl:sticky xl:top-28 xl:self-start">
+          <Sidebar
+            activeView={activeView}
+            onNavigate={setActiveView}
+            settings={settings}
+            onSaveSettings={handleSaveSettings}
+          />
+        </aside>
+      </div>
 
       <Toaster
         position="top-right"
